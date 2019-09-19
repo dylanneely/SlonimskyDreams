@@ -1,0 +1,24 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "target": "es6",
+    "lib": ["es2015", "dom"],
+    "outDir": "es6/",
+    "noUnusedLocals": false,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedParameters": false,
+    "pretty": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowUnreachableCode": false,
+    "experimentalDecorators": true
+  },
+  "include": [
+    "*.ts"
+  ]
+}
