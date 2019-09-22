@@ -13,7 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 import * as tf from '@tensorflow/tfjs-core';
-import {KeyboardElement} from './keyboard_element';
 // import * as p5sound from 'p5/lib/addons/p5.sound';
 // import * as p5dom from 'p5/lib/addons/p5.dom';
 import * as p5 from 'p5';
@@ -270,9 +269,6 @@ const EVENT_SIZE = calculateEventSize();
 const PRIMER_IDX = 355;  // shift 1s.
 let lastSample = tf.scalar(PRIMER_IDX, 'int32');
 
-const container = document.querySelector('#keyboard');
-const keyboardInterface = new KeyboardElement(container);
-
 const piano = new Piano({velocities: 4}).toMaster();
 
 const SALAMANDER_URL = 'https://storage.googleapis.com/' +
@@ -302,9 +298,6 @@ function start() {
                              tf.loadWeights(manifest, CHECKPOINT_URL));
       })
       .then((vars: {[varName: string]: tf.Tensor}) => {
-        document.querySelector('#status').classList.add('hidden');
-        document.querySelector('#controls').classList.remove('hidden');
-        document.querySelector('#keyboard').classList.remove('hidden');
 
         lstmKernel1 =
             vars['rnn/multi_rnn_cell/cell_0/basic_lstm_cell/kernel'] as
@@ -352,13 +345,6 @@ function resetRnn() {
   generateStep(currentLoopId);
 }
 
-window.addEventListener('resize', resize);
-
-function resize() {
-  keyboardInterface.resize();
-}
-
-resize();
 
 const densityControl =
     document.getElementById('note-density') as HTMLInputElement;
@@ -674,7 +660,7 @@ let activeMidiOutputDevice: any = null;
 
 
 /**
- * Decode the output index and play it on the piano and keyboardInterface.
+ * Decode the output index and play it on the piano.
  */
 function playOutput(index: number) {
   let offset = 0;
@@ -687,12 +673,6 @@ function playOutput(index: number) {
         const noteNum = index - offset;
         //console.log(noteNum + ',' + currentVelocity);
         newNote = [true, noteNum, currentVelocity];
-        setTimeout(() => {
-          keyboardInterface.keyDown(noteNum);
-          setTimeout(() => {
-            keyboardInterface.keyUp(noteNum);
-          }, 100);
-        }, (currentPianoTimeSec - piano.now()) * 1000);
         activeNotes.set(noteNum, currentPianoTimeSec);
 
         if (activeMidiOutputDevice != null) {
@@ -795,7 +775,7 @@ let sketch = function (p: p5) {
   p.draw = function () {
     p.fill(0, 12);
     p.rect(0, 0, p.windowWidth, p.windowHeight);
-    p.fill(255);
+    p.fill(255); //in grayscale 0 = pure black & 255 = pure white;
     p.noStroke();
     if (newNote[0]) {
       let GoldenNote: number = newNote[1] * Math.E;

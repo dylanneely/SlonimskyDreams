@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const tf = require("@tensorflow/tfjs-core");
-const keyboard_element_1 = require("./keyboard_element");
 const p5 = require("p5");
 let newNote = [false, 0, 0];
 const Piano = require('tone-piano').Piano;
@@ -210,8 +209,6 @@ function calculateEventSize() {
 const EVENT_SIZE = calculateEventSize();
 const PRIMER_IDX = 355;
 let lastSample = tf.scalar(PRIMER_IDX, 'int32');
-const container = document.querySelector('#keyboard');
-const keyboardInterface = new keyboard_element_1.KeyboardElement(container);
 const piano = new Piano({ velocities: 4 }).toMaster();
 const SALAMANDER_URL = 'https://storage.googleapis.com/' +
     'download.magenta.tensorflow.org/demos/SalamanderPiano/';
@@ -235,9 +232,6 @@ function start() {
             .then((manifest) => tf.loadWeights(manifest, CHECKPOINT_URL));
     })
         .then((vars) => {
-        document.querySelector('#status').classList.add('hidden');
-        document.querySelector('#controls').classList.remove('hidden');
-        document.querySelector('#keyboard').classList.remove('hidden');
         lstmKernel1 =
             vars['rnn/multi_rnn_cell/cell_0/basic_lstm_cell/kernel'];
         lstmBias1 = vars['rnn/multi_rnn_cell/cell_0/basic_lstm_cell/bias'];
@@ -273,11 +267,6 @@ function resetRnn() {
     currentLoopId++;
     generateStep(currentLoopId);
 }
-window.addEventListener('resize', resize);
-function resize() {
-    keyboardInterface.resize();
-}
-resize();
 const densityControl = document.getElementById('note-density');
 const densityDisplay = document.getElementById('note-density-display');
 const conditioningControlsElem = document.getElementById('conditioning-controls');
@@ -522,12 +511,6 @@ function playOutput(index) {
             if (eventType === 'note_on') {
                 const noteNum = index - offset;
                 newNote = [true, noteNum, currentVelocity];
-                setTimeout(() => {
-                    keyboardInterface.keyDown(noteNum);
-                    setTimeout(() => {
-                        keyboardInterface.keyUp(noteNum);
-                    }, 100);
-                }, (currentPianoTimeSec - piano.now()) * 1000);
                 activeNotes.set(noteNum, currentPianoTimeSec);
                 if (activeMidiOutputDevice != null) {
                     try {
