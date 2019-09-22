@@ -14,10 +14,12 @@ limitations under the License.
 ==============================================================================*/
 import * as tf from '@tensorflow/tfjs-core';
 import {KeyboardElement} from './keyboard_element';
-import * as p5sound from 'p5/lib/addons/p5.sound';
-import * as p5dom from 'p5/lib/addons/p5.dom';
-import * as p5 from 'p5'
-//require('p5/lib/addons/p5.dom')
+// import * as p5sound from 'p5/lib/addons/p5.sound';
+// import * as p5dom from 'p5/lib/addons/p5.dom';
+import * as p5 from 'p5';
+let newNote: Array<any> = [false, 0, 0];
+
+
 
 // tslint:disable-next-line:no-require-imports
 const Piano = require('tone-piano').Piano;
@@ -28,15 +30,130 @@ const mel2 = [0, 2, 6, 8];
 const mel3 = [0, 4, 6, 10];
 const mel4 = [0, 5, 6, 11];
 //interpolation of two notes - division of octave into 2 parts
-const mel5 = [0, 1, 2, 6, 7, 9];
+const mel5 = [0, 1, 2, 6, 7, 8];
 const mel6 = [0, 1, 3, 6, 7, 9];
 const mel7 = [0, 1, 4, 6, 7, 10];
 const mel8 = [0, 1, 5, 6, 7, 11];
-const mel9 = [0, 2, 3, 6, 8, 10];
+const mel9 = [0, 2, 3, 6, 8, 9];
 const mel10 = [0, 2, 5, 6, 8, 11];
 const mel11 = [0, 3, 4, 6, 9, 10];
 const mel12 = [0, 3, 5, 6, 9, 11];
 const mel13 = [0, 4, 5, 6, 10, 11];
+//interpolation of three notes - division of octave into 2 parts
+const mel14 = [0, 1, 2, 3, 6, 7, 8, 9];
+const mel15 = [0, 1, 2, 4, 6, 7, 8, 10];
+const mel16 = [0, 1, 2, 5, 6, 7, 8, 11];
+const mel17 = [0, 1, 3, 5, 6, 7, 9, 11];
+const mel18 = [0, 1, 4, 5, 6, 7, 10, 11];
+const mel19 = [0, 2, 3, 4, 6, 8, 9, 10];
+const mel20 = [0, 2, 3, 5, 6, 8, 9, 11];
+const mel21 = [0, 2, 4, 5, 6, 8, 10, 11];
+//interpolation of four notes - division of octave into 2 parts
+const mel22 = [0, 1, 2, 3, 4, 6, 7, 8, 9, 10];
+const mel23 = [0, 1, 2, 3, 5, 6, 7, 8, 9, 11];
+const mel24 = [0, 1, 2, 4, 5, 6, 7, 8, 10, 11];
+const mel25 = [0, 1, 3, 4, 5, 6, 7, 9, 10, 11];
+const mel26 = [0, 2, 3, 4, 5, 6, 8, 9, 10, 11];
+//symmetric interpolation of one note
+const mel27 = [0, 1, 6, 11];
+const mel28 = [0, 2, 6, 10];
+const mel29 = [0, 3, 6, 9];
+const mel30 = [0, 4, 6, 8];
+const mel31 = [0, 5, 6, 7];
+//symmetric interpolation of two notes
+const mel32 = [0, 1, 2, 6, 10, 11];
+const mel33 = [0, 1, 3, 6, 9, 11];
+const mel34 = [0, 1, 4, 6, 8, 11];
+const mel35 = [0, 2, 3, 6, 9, 10];
+const mel36 = [0, 2, 4, 6, 8, 10]; //whole tone scale
+const mel37 = [0, 2, 5, 6, 7, 10];
+const mel38 = [0, 3, 4, 6, 8, 9];
+const mel39 = [0, 3, 5, 6, 7, 9];
+const mel40 = [0, 4, 5, 6, 7, 8];
+//symmetric interpolation of three notes
+const mel41 = [0, 1, 2, 3, 6, 9, 10, 11];
+const mel42 = [0, 1, 2, 4, 6, 8, 10, 11];
+const mel43 = [0, 1, 2, 5, 6, 7, 10, 11];
+const mel44 = [0, 1, 3, 4, 6, 8, 9, 11];
+const mel45 = [0, 1, 3, 5, 6, 7, 8, 11];
+const mel46 = [0, 2, 3, 5, 6, 7, 9, 10];
+const mel47 = [0, 2, 4, 5, 6, 7, 8, 10];
+const mel48 = [0, 3, 4, 5, 6, 7, 8, 9];
+//non-symmetric interpolation
+const mel49 = [0, 1, 4, 6, 9, 10];
+const mel50 = [0, 2, 4, 6, 9, 10];
+const mel51 = [0, 1, 3, 5, 6, 8, 10, 11];
+const mel52 = [0, 1, 3, 4, 5, 6, 8, 9, 10, 11];
+//ultrapolation of one note
+const mel53 = mel1;
+const mel54 = mel2;
+const mel55 = mel29;
+const mel56 = mel3;
+const mel57 = mel4;
+const mel58 = mel27;
+//ultrapolation of one note
+const mel59 = mel5
+const mel60 = mel6;
+const mel61 = mel7;
+const mel62 = mel8;
+const mel63 = mel9;
+const mel64 = mel36;
+const mel65 = mel10;
+const mel66 = mel11;
+const mel67 = mel12;
+const mel68 = mel13;
+const mel69 = mel5;
+const mel70 = mel6;
+const mel71 = mel7;
+//ultrapolation of three notes
+const mel72 = [0, 1, 3, 4, 6, 7, 9, 10];
+const mel73 = mel17;
+const mel74 = mel18;
+const mel75 = mel21;
+const mel76 = mel5;
+const mel77 = mel6;
+const mel78 = mel7;
+const mel79 = mel15;
+//infrapolation of one note
+const mel80 = mel4;
+const mel81 = mel3;
+const mel82 = mel29;
+const mel83 = mel2;
+const mel84 = mel1;
+//infrapolation of two notes
+const mel85 = mel13;
+const mel86 = mel12;
+const mel87 = mel10;
+const mel88 = mel8;
+const mel89 = mel11;
+const mel90 = mel36;
+const mel91 = mel7;
+const mel92 = mel9;
+const mel93 = mel6;
+//infrapolation of three notes
+const mel94 = mel12;
+const mel95 = mel7;
+const mel96 = mel9;
+const mel97 = mel21;
+const mel98 = mel72;
+//infra-interpolation
+const mel99 = mel10;
+const mel100 = mel12;
+const mel101 = mel7;
+const mel102 = mel36;
+const mel103 = mel11;
+const mel104 = mel6;
+const mel105 = mel9;
+const mel106 = mel11;
+const mel107 = mel6;
+//infra-ultrapolation
+const mel108 = mel8;
+const mel109 = mel10;
+const mel110 = mel12;
+const mel111 = mel13;
+
+
+
 
 let emptyHist: number[] = new Array(12);
 // emptyHist.fill(0); // this is giving me an error
@@ -395,6 +512,7 @@ document.getElementById('newDream').onclick = () => {
   updatePitchHistogram(SlonimskyHists[randomScale]);
 };
 
+
 document.getElementById('reset-rnn').onclick = () => {
   resetRnn();
 };
@@ -462,6 +580,7 @@ async function generateStep(loopId: number) {
       h.forEach(h => h.dispose());
       c = output[0];
       h = output[1];
+
 
       const outputH = h[2];
       const logits = outputH.matMul(fcW).add(fcB);
@@ -557,6 +676,8 @@ function playOutput(index: number) {
     if (offset <= index && index <= offset + maxValue - minValue) {
       if (eventType === 'note_on') {
         const noteNum = index - offset;
+        //console.log(noteNum + ',' + currentVelocity);
+        newNote = [true, noteNum, currentVelocity];
         setTimeout(() => {
           keyboardInterface.keyDown(noteNum);
           setTimeout(() => {
@@ -654,19 +775,29 @@ function resetRnnRepeatedly() {
 }
 setTimeout(resetRnnRepeatedly, RESET_RNN_FREQUENCY_MS);
 
+// let pg: p5;
 
 let sketch = function (p: p5) {
   p.setup = function () {
-    p.createCanvas(p.windowWidth, p.windowHeight);
-}
-
+  p.createCanvas(p.windowWidth, p.windowHeight);
+  p.frameRate(50);
+} // eliminated createGraphic as it was slowing the animation down.
+  //Nice effect if the processor can handle it (or if it was coded better).
   p.draw = function () {
-    if (p.mouseIsPressed) {
-      p.fill(0, 0, 0)
-    } else {
-      p.fill(255, 0, 0)
+    p.fill(0, 12);
+    p.rect(0, 0, p.windowWidth, p.windowHeight);
+    p.fill(255);
+    p.noStroke();
+    if (newNote[0]) {
+      let GoldenNote: number = newNote[1] * Math.E;
+      p.fill(p.color(newNote[2] * 255, newNote[1], p.random(255)));
+      p.ellipse(p.random(1000), p.random(1000), GoldenNote, newNote[1]);
+      newNote[0] = false;
     }
-    p.ellipse(p.mouseX, p.mouseY, 80, 80)
+  }
+  p.mousePressed = function() {
+    let randomScale = Math.floor(Math.random() * SloHistsLength);
+    updatePitchHistogram(SlonimskyHists[randomScale]);
   }
 }
 
