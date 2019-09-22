@@ -124,6 +124,7 @@ const mel108 = mel8;
 const mel109 = mel10;
 const mel110 = mel12;
 const mel111 = mel13;
+let SlonimskyIndex = 0;
 let emptyHist = new Array(12);
 emptyHist = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 function PitchSetToHistogram(melody) {
@@ -179,6 +180,7 @@ let pitchHistogramEncoding;
 let noteDensityEncoding;
 let conditioned = true;
 let currentPianoTimeSec = 0;
+let newMelTimeOut = currentPianoTimeSec;
 let pianoStartTimestampMs = 0;
 let currentVelocity = 100;
 const MIN_MIDI_PITCH = 0;
@@ -464,6 +466,14 @@ function generateStep(loopId) {
         }
         const delta = Math.max(0, currentPianoTimeSec - piano.now() - GENERATION_BUFFER_SECONDS);
         setTimeout(() => generateStep(loopId), delta * 1000);
+        if ((piano.now() - newMelTimeOut) > 30) {
+            SlonimskyIndex += 1;
+            updatePitchHistogram(SlonimskyHists[SlonimskyIndex]);
+            console.log(SlonimskyHists[SlonimskyIndex]);
+            console.log(newMelTimeOut);
+            newMelTimeOut = currentPianoTimeSec;
+            console.log(newMelTimeOut);
+        }
     });
 }
 let midi;
@@ -610,10 +620,6 @@ let sketch = function (p) {
             p.ellipse(p.random(1000), p.random(1000), GoldenNote, newNote[1]);
             newNote[0] = false;
         }
-    };
-    p.mousePressed = function () {
-        let randomScale = Math.floor(Math.random() * SloHistsLength);
-        updatePitchHistogram(SlonimskyHists[randomScale]);
     };
 };
 new p5(sketch);
