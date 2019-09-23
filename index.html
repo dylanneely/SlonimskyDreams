@@ -35,17 +35,16 @@ limitations under the License.
     body #roll {
       display: none;
         width: 100%;
-        height: calc(100% - 130px);
+        height: 0px;
         top: 0;
         left: 0
     }
     #container #bottom,
     body #bottom {
         width: 100%;
-        height: 30px;
+        height: 0px;
         bottom: 0;
         left: 0;
-        position: absolute;
         background-color: #222;
         box-shadow: inset 0 12px 30px -5px rgba(0, 0, 0, .75)
     }
@@ -64,7 +63,7 @@ limitations under the License.
       font-size: 10px;
       text-align: center;
       line-height: 10px;
-      height: 30px;
+      height: 0px;
     }
 
     .hidden {
@@ -76,23 +75,6 @@ limitations under the License.
       margin-left: 40px;
     }
 
-    .text-block {
-      font-size: 10px;
-      line-height: 10px;
-      margin-top: 12px;
-      width: 100%;
-      text-align: center;
-      font-weight: regular;
-    }
-
-    .header {
-      font-size: 50px;
-      line-height: 50px;
-      margin-top: 10px;
-      width: 100%;
-      text-align: center;
-      font-weight: bold;
-    }
 
     .link {
       color: #6fc9c6;
@@ -149,22 +131,12 @@ limitations under the License.
       bottom: 0;
       background-color: green;
     }
-    #resettingText {
-      font-size: 20px;
-      transition: opacity 1s;
-      text-align: center;
-      margin-top: 15px;
-    }
   </style>
 </head>
 <body>
   <!-- Header -->
 
   <div id="container">
-    <div class="header">Slonimsky Dreams</div>
-    <div class="text-block">
-      Slonimsky Dreams on the <a href="https://en.wikipedia.org/wiki/Nicolas_Slonimsky#Writings_and_musical_criticism">"Thesaurus of Scales and Melodic Patterns."</a> <a href="https://magenta.tensorflow.org/performance-rnn">It is built on <a href="https://magenta.tensorflow.org/performance-rnn">Magenta's Performance RNN</a>, which was trained in TensorFlow on MIDI from piano performances. </a> It was then ported to run in the browser using only Javascript in the <a href="https://js.tensorflow.org/">TensorFlow.js</a> environment. Piano samples are from <a href="https://archive.org/details/SalamanderGrandPianoV3">Salamander Grand Piano.</a>
-    </div>
     <div id="status"></div>
     <div id="controls" class="hidden">
       <div id="conditioning-controls">
@@ -267,9 +239,6 @@ limitations under the License.
       <div class="control" style="margin-right: 20px;">
         <input type="button" value="Reset RNN" id="reset-rnn">
       </div>
-    </div>
-    <div id="resettingText" style="opacity: 0">
-      Resetting...
     </div>
   </div>
 

@@ -575,32 +575,27 @@ function playOutput(index) {
     }
     throw new Error(`Could not decode index: ${index}`);
 }
-const resettingText = document.getElementById('resettingText');
 function resetRnnRepeatedly() {
     if (modelReady) {
         resetRnn();
-        resettingText.style.opacity = '100';
     }
-    setTimeout(() => {
-        resettingText.style.opacity = '0';
-    }, 1000);
     setTimeout(resetRnnRepeatedly, RESET_RNN_FREQUENCY_MS);
 }
 setTimeout(resetRnnRepeatedly, RESET_RNN_FREQUENCY_MS);
 let sketch = function (p) {
+    let width = p.windowWidth;
+    let height = p.windowHeight;
     p.setup = function () {
-        p.createCanvas(p.windowWidth, p.windowHeight);
-        p.frameRate(50);
+        p.createCanvas(width, height);
     };
     p.draw = function () {
         p.fill(0, 12);
-        p.rect(0, 0, p.windowWidth, p.windowHeight);
-        p.fill(255);
+        p.rect(0, 0, width, height);
         p.noStroke();
         if (newNote[0]) {
             let GoldenNote = newNote[1] * Math.E;
-            p.fill(p.color(newNote[2] * 255, newNote[1], p.random(255)));
-            p.ellipse(p.random(1000), p.random(1000), GoldenNote, newNote[1]);
+            p.fill(p.color(newNote[2] * 255, newNote[1] * 2, p.random(255)));
+            p.ellipse(p.random(width), p.random(height), GoldenNote, newNote[1]);
             newNote[0] = false;
         }
     };

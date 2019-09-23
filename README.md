@@ -1,13 +1,4 @@
-# Performance RNN Browser Demo
-
-This code is a port of the [Performance RNN](https://magenta.tensorflow.org/performance-rnn) model
-to the [TensorFlow.js](https://js.tensorflow.org) environment.
-
-<img src="https://magenta.tensorflow.org/assets/performance_rnn/performance_rnn.gif">
-
-# Demo
-
-To view a hosted version of the demo, go to https://goo.gl/magenta/performancernn-demo
+Slonimsky Dreams on the <a href="https://en.wikipedia.org/wiki/Nicolas_Slonimsky#Writings_and_musical_criticism">"Thesaurus of Scales and Melodic Patterns."</a> <a href="https://magenta.tensorflow.org/performance-rnn">It is built on <a href="https://magenta.tensorflow.org/performance-rnn">Magenta's Performance RNN</a>, which was trained in TensorFlow on MIDI from piano performances. </a> It was then ported to run in the browser using only Javascript in the <a href="https://js.tensorflow.org/">TensorFlow.js</a> environment. Piano samples are from <a href="https://archive.org/details/SalamanderGrandPianoV3">Salamander Grand Piano.</a>
 
 # Building
 

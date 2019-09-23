@@ -750,16 +750,10 @@ function playOutput(index: number) {
 
 // Reset the RNN repeatedly so it doesn't trail off into incoherent musical
 // babble.
-const resettingText = document.getElementById('resettingText');
 function resetRnnRepeatedly() {
   if (modelReady) {
     resetRnn();
-    resettingText.style.opacity = '100';
   }
-
-  setTimeout(() => {
-    resettingText.style.opacity = '0';
-  }, 1000);
   setTimeout(resetRnnRepeatedly, RESET_RNN_FREQUENCY_MS);
 }
 setTimeout(resetRnnRepeatedly, RESET_RNN_FREQUENCY_MS);
@@ -767,20 +761,20 @@ setTimeout(resetRnnRepeatedly, RESET_RNN_FREQUENCY_MS);
 // let pg: p5;
 
 let sketch = function (p: p5) {
+  let width = p.windowWidth;
+  let height = p.windowHeight;
   p.setup = function () {
-  p.createCanvas(p.windowWidth, p.windowHeight);
-  p.frameRate(50);
+  p.createCanvas(width, height);
 } // eliminated createGraphic as it was slowing the animation down.
   //Nice effect if the processor can handle it (or if it was coded better).
   p.draw = function () {
     p.fill(0, 12);
-    p.rect(0, 0, p.windowWidth, p.windowHeight);
-    p.fill(255); //in grayscale 0 = pure black & 255 = pure white;
+    p.rect(0, 0, width, height);
     p.noStroke();
     if (newNote[0]) {
       let GoldenNote: number = newNote[1] * Math.E;
-      p.fill(p.color(newNote[2] * 255, newNote[1], p.random(255)));
-      p.ellipse(p.random(1000), p.random(1000), GoldenNote, newNote[1]);
+      p.fill(p.color(newNote[2] * 255, newNote[1] * 2, p.random(255)));
+      p.ellipse(p.random(width), p.random(height), GoldenNote, newNote[1]);
       newNote[0] = false;
     }
   }
@@ -788,6 +782,8 @@ let sketch = function (p: p5) {
   //   let randomScale = Math.floor(Math.random() * SloHistsLength);
   //   updatePitchHistogram(SlonimskyHists[randomScale]);
   // }
+  //what about mapping the scales to the day, so that Slonimsky dreams through every day,
+  //with all the scales taking the length of 24 hours?
 }
 
 new p5(sketch)
