@@ -13,184 +13,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 import * as tf from '@tensorflow/tfjs-core';
-// import * as p5sound from 'p5/lib/addons/p5.sound';
-// import * as p5dom from 'p5/lib/addons/p5.dom';
 import * as p5 from 'p5';
+import {SlonimskyHists} from './Slonimsky';
+import {daysIndexDuration} from './Slonimsky';
+
 let newNote: Array<any> = [false, 0, 0];
-
-
 
 // tslint:disable-next-line:no-require-imports
 const Piano = require('tone-piano').Piano;
-
-//interpolation of one note - division of octave into 2 parts
-const mel1 = [0, 1, 6, 7];
-const mel2 = [0, 2, 6, 8];
-const mel3 = [0, 4, 6, 10];
-const mel4 = [0, 5, 6, 11];
-//interpolation of two notes - division of octave into 2 parts
-const mel5 = [0, 1, 2, 6, 7, 8];
-const mel6 = [0, 1, 3, 6, 7, 9];
-const mel7 = [0, 1, 4, 6, 7, 10];
-const mel8 = [0, 1, 5, 6, 7, 11];
-const mel9 = [0, 2, 3, 6, 8, 9];
-const mel10 = [0, 2, 5, 6, 8, 11];
-const mel11 = [0, 3, 4, 6, 9, 10];
-const mel12 = [0, 3, 5, 6, 9, 11];
-const mel13 = [0, 4, 5, 6, 10, 11];
-//interpolation of three notes - division of octave into 2 parts
-const mel14 = [0, 1, 2, 3, 6, 7, 8, 9];
-const mel15 = [0, 1, 2, 4, 6, 7, 8, 10];
-const mel16 = [0, 1, 2, 5, 6, 7, 8, 11];
-const mel17 = [0, 1, 3, 5, 6, 7, 9, 11];
-const mel18 = [0, 1, 4, 5, 6, 7, 10, 11];
-const mel19 = [0, 2, 3, 4, 6, 8, 9, 10];
-const mel20 = [0, 2, 3, 5, 6, 8, 9, 11];
-const mel21 = [0, 2, 4, 5, 6, 8, 10, 11];
-//interpolation of four notes - division of octave into 2 parts
-const mel22 = [0, 1, 2, 3, 4, 6, 7, 8, 9, 10];
-const mel23 = [0, 1, 2, 3, 5, 6, 7, 8, 9, 11];
-const mel24 = [0, 1, 2, 4, 5, 6, 7, 8, 10, 11];
-const mel25 = [0, 1, 3, 4, 5, 6, 7, 9, 10, 11];
-const mel26 = [0, 2, 3, 4, 5, 6, 8, 9, 10, 11];
-//symmetric interpolation of one note
-const mel27 = [0, 1, 6, 11];
-const mel28 = [0, 2, 6, 10];
-const mel29 = [0, 3, 6, 9];
-const mel30 = [0, 4, 6, 8];
-const mel31 = [0, 5, 6, 7];
-//symmetric interpolation of two notes
-const mel32 = [0, 1, 2, 6, 10, 11];
-const mel33 = [0, 1, 3, 6, 9, 11];
-const mel34 = [0, 1, 4, 6, 8, 11];
-const mel35 = [0, 2, 3, 6, 9, 10];
-const mel36 = [0, 2, 4, 6, 8, 10]; //whole tone scale
-const mel37 = [0, 2, 5, 6, 7, 10];
-const mel38 = [0, 3, 4, 6, 8, 9];
-const mel39 = [0, 3, 5, 6, 7, 9];
-const mel40 = [0, 4, 5, 6, 7, 8];
-//symmetric interpolation of three notes
-const mel41 = [0, 1, 2, 3, 6, 9, 10, 11];
-const mel42 = [0, 1, 2, 4, 6, 8, 10, 11];
-const mel43 = [0, 1, 2, 5, 6, 7, 10, 11];
-const mel44 = [0, 1, 3, 4, 6, 8, 9, 11];
-const mel45 = [0, 1, 3, 5, 6, 7, 8, 11];
-const mel46 = [0, 2, 3, 5, 6, 7, 9, 10];
-const mel47 = [0, 2, 4, 5, 6, 7, 8, 10];
-const mel48 = [0, 3, 4, 5, 6, 7, 8, 9];
-//non-symmetric interpolation
-const mel49 = [0, 1, 4, 6, 9, 10];
-const mel50 = [0, 2, 4, 6, 9, 10];
-const mel51 = [0, 1, 3, 5, 6, 8, 10, 11];
-const mel52 = [0, 1, 3, 4, 5, 6, 8, 9, 10, 11];
-//ultrapolation of one note
-const mel53 = mel1;
-const mel54 = mel2;
-const mel55 = mel29;
-const mel56 = mel3;
-const mel57 = mel4;
-const mel58 = mel27;
-//ultrapolation of one note
-const mel59 = mel5
-const mel60 = mel6;
-const mel61 = mel7;
-const mel62 = mel8;
-const mel63 = mel9;
-const mel64 = mel36;
-const mel65 = mel10;
-const mel66 = mel11;
-const mel67 = mel12;
-const mel68 = mel13;
-const mel69 = mel5;
-const mel70 = mel6;
-const mel71 = mel7;
-//ultrapolation of three notes
-const mel72 = [0, 1, 3, 4, 6, 7, 9, 10];
-const mel73 = mel17;
-const mel74 = mel18;
-const mel75 = mel21;
-const mel76 = mel5;
-const mel77 = mel6;
-const mel78 = mel7;
-const mel79 = mel15;
-//infrapolation of one note
-const mel80 = mel4;
-const mel81 = mel3;
-const mel82 = mel29;
-const mel83 = mel2;
-const mel84 = mel1;
-//infrapolation of two notes
-const mel85 = mel13;
-const mel86 = mel12;
-const mel87 = mel10;
-const mel88 = mel8;
-const mel89 = mel11;
-const mel90 = mel36;
-const mel91 = mel7;
-const mel92 = mel9;
-const mel93 = mel6;
-//infrapolation of three notes
-const mel94 = mel12;
-const mel95 = mel7;
-const mel96 = mel9;
-const mel97 = mel21;
-const mel98 = mel72;
-//infra-interpolation
-const mel99 = mel10;
-const mel100 = mel12;
-const mel101 = mel7;
-const mel102 = mel36;
-const mel103 = mel11;
-const mel104 = mel6;
-const mel105 = mel9;
-const mel106 = mel11;
-const mel107 = mel6;
-//infra-ultrapolation
-const mel108 = mel8;
-const mel109 = mel10;
-const mel110 = mel12;
-const mel111 = mel13;
-
-let SlonimskyIndex = 0;
-
-
-let emptyHist: number[] = new Array(12);
-// emptyHist.fill(0); // this is giving me an error
-emptyHist = [0,0,0,0,0,0,0,0,0,0,0,0];
-
-function PitchSetToHistogram(melody: number[]) {
-  let pitchSet: number[] = melody;
-  //console.log(pitchSet)
-  for (let pitches of pitchSet) {
-    emptyHist[pitches] = 1 }
-  let histogram = emptyHist;
-  emptyHist = [0,0,0,0,0,0,0,0,0,0,0,0];
-  //console.log(histogram);
-  return histogram;
-}
-
-function OrdinalDataFill(array: Array<string>, prefix: string, length: number) {
-  for (let i = 0; i < length; i++) {
-    array.push(prefix + (i+1));
-  }
-  console.log(array)
-}
-let Slonimsky: Array<string> = [];
-OrdinalDataFill(Slonimsky, 'mel', 13);
-
-function AllPitchSetsToHistogram(melodies: string[]) {
-  let SlonimskyHistograms: number[][] = [];
-   for (let set of melodies) {
-     let pitchSet: number[] = eval(set);
-     let histogram: number[] = PitchSetToHistogram(pitchSet);
-     SlonimskyHistograms.push(histogram);
-   }
-   console.log(SlonimskyHistograms);
-   return SlonimskyHistograms;
- }
-
-const SlonimskyHists: number[][] = AllPitchSetsToHistogram(Slonimsky);
-const SloHistsLength: number = AllPitchSetsToHistogram(Slonimsky).length;
 
 let lstmKernel1: tf.Tensor2D;
 let lstmBias1: tf.Tensor1D;
@@ -204,6 +34,9 @@ let fcB: tf.Tensor1D;
 let fcW: tf.Tensor2D;
 const forgetBias = tf.scalar(1.0);
 const activeNotes = new Map<number, number>();
+
+let SloTotal = SlonimskyHists.length;
+let SlonimskyIndex = daysIndexDuration(SloTotal)[0];
 
 // How many steps to generate per generateStep call.
 // Generating more steps makes it less likely that we'll lag behind in note
@@ -222,14 +55,13 @@ const NOTES_PER_OCTAVE = 12;
 const DENSITY_BIN_RANGES = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0];
 const PITCH_HISTOGRAM_SIZE = NOTES_PER_OCTAVE;
 
-const RESET_RNN_FREQUENCY_MS = 30000;
+const RESET_RNN_FREQUENCY_MS = daysIndexDuration(SloTotal)[1] * 2 * 1000; //dreams through the total every 12 hours with the 2x multiplier
 
 let pitchHistogramEncoding: tf.Tensor1D;
 let noteDensityEncoding: tf.Tensor1D;
 let conditioned = true;
 
 let currentPianoTimeSec = 0;
-let newMelTimeOut = currentPianoTimeSec;
 // When the piano roll starts in browser-time via performance.now().
 let pianoStartTimestampMs = 0;
 
@@ -350,93 +182,23 @@ const densityControl =
     document.getElementById('note-density') as HTMLInputElement;
 const densityDisplay = document.getElementById('note-density-display');
 
-const conditioningControlsElem =
-    document.getElementById('conditioning-controls') as HTMLDivElement;
-
 const gainSliderElement = document.getElementById('gain') as HTMLInputElement;
-const gainDisplayElement =
-    document.getElementById('gain-display') as HTMLSpanElement;
 let globalGain = +gainSliderElement.value;
-gainDisplayElement.innerText = globalGain.toString();
-gainSliderElement.addEventListener('input', () => {
-  globalGain = +gainSliderElement.value;
-  gainDisplayElement.innerText = globalGain.toString();
-});
 
 const notes = ['c', 'cs', 'd', 'ds', 'e', 'f', 'fs', 'g', 'gs', 'a', 'as', 'b'];
 
 const pitchHistogramElements = notes.map(
     note => document.getElementById('pitch-' + note) as HTMLInputElement);
-const histogramDisplayElements = notes.map(
-    note => document.getElementById('hist-' + note) as HTMLDivElement);
-
-let Slonimsky1 = PitchSetToHistogram(mel1);
-let Slonimsky2 = PitchSetToHistogram(mel2);
-try {
-  parseHash();
-} catch (e) {
-  // If we didn't successfully parse the hash, we can just use defaults.
-  console.warn(e);
-}
-
-function parseHash() {
-  if (!window.location.hash) {
-    return;
-  }
-  const params = window.location.hash.substr(1).split('|');
-  densityControl.value = params[0];
-  const pitches = params[1].split(',');
-  for (let i = 0; i < pitchHistogramElements.length; i++) {
-    pitchHistogramElements[i].value = pitches[i];
-  }
-  const SlonimskyValues = params[2].split(',');
-  for (let i = 0; i < Slonimsky1.length; i++) {
-    Slonimsky1[i] = parseInt(SlonimskyValues[i], 10);
-  }
-  const Slonimsky2Values = params[3].split(',');
-  for (let i = 0; i < Slonimsky2.length; i++) {
-    Slonimsky2[i] = parseInt(Slonimsky2Values[i], 10);
-  }
-  if (params[4] === 'true') {
-    enableConditioning();
-
-  } else if (params[4] === 'false') {
-    disableConditioning();
-  }
-}
-
-function enableConditioning() {
-  conditioned = true;
-
-  conditioningControlsElem.classList.remove('inactive');
-  conditioningControlsElem.classList.remove('midicondition');
-
-  updateConditioningParams();
-}
-function disableConditioning() {
-  conditioned = false;
-
-  conditioningControlsElem.classList.add('inactive');
-  conditioningControlsElem.classList.remove('midicondition');
-
-  updateConditioningParams();
-}
 
 function updateConditioningParams() {
   const pitchHistogram = pitchHistogramElements.map(e => {
     return parseInt(e.value, 10) || 0;
   });
-  updateDisplayHistogram(pitchHistogram);
-
+  console.log('Scale ' + (SlonimskyIndex + 1) + ': ' + pitchHistogram);
   if (noteDensityEncoding != null) {
     noteDensityEncoding.dispose();
     noteDensityEncoding = null;
   }
-
-  window.location.assign(
-      '#' + densityControl.value + '|' + pitchHistogram.join(',') + '|' +
-      Slonimsky1.join(',') + '|' + Slonimsky2.join(',') + '|' +
-      (conditioned ? 'true' : 'false'));
 
   const noteDensityIdx = parseInt(densityControl.value, 10) || 0;
   const noteDensity = DENSITY_BIN_RANGES[noteDensityIdx];
@@ -461,12 +223,6 @@ function updateConditioningParams() {
   pitchHistogramEncoding = buffer.toTensor();
 }
 
-document.getElementById('note-density').oninput = updateConditioningParams;
-pitchHistogramElements.forEach(e => {
-  e.oninput = updateConditioningParams;
-});
-updateConditioningParams();
-
 function updatePitchHistogram(newHist: number[]) {
   let allZero = true;
   for (let i = 0; i < newHist.length; i++) {
@@ -478,40 +234,10 @@ function updatePitchHistogram(newHist: number[]) {
   for (let i = 0; i < newHist.length; i++) {
     pitchHistogramElements[i].value = newHist[i].toString();
   }
-
   updateConditioningParams();
 }
-function updateDisplayHistogram(hist: number[]) {
-  let sum = 0;
-  for (let i = 0; i < hist.length; i++) {
-    sum += hist[i];
-  }
 
-  for (let i = 0; i < hist.length; i++) {
-    histogramDisplayElements[i].style.height =
-        (100 * (hist[i] / sum)).toString() + 'px';
-  }
-}
-
-document.getElementById('newDream').onclick = () => {
-  let randomScale = Math.floor(Math.random() * SloHistsLength);
-  document.getElementById('fib-scale').innerHTML = Slonimsky[randomScale];
-  updatePitchHistogram(SlonimskyHists[randomScale]);
-};
-
-
-document.getElementById('reset-rnn').onclick = () => {
-  resetRnn();
-};
-
-document.getElementById('Slonimsky1').onclick = () => {
-  updatePitchHistogram(Slonimsky1);
-};
-
-document.getElementById('Slonimsky2').onclick = () => {
-  updatePitchHistogram(Slonimsky2);
-};
-
+updatePitchHistogram(SlonimskyHists[SlonimskyIndex]);
 
 function getConditioning(): tf.Tensor1D {
   return tf.tidy(() => {
@@ -533,10 +259,6 @@ function getConditioning(): tf.Tensor1D {
 }
 
 async function generateStep(loopId: number) {
-  if (loopId < currentLoopId) {
-    // Was part of an outdated generateStep() scheduled via setTimeout.
-    return;
-  }
 
   const lstm1 = (data: tf.Tensor2D, c: tf.Tensor2D, h: tf.Tensor2D) =>
       tf.basicLSTMCell(forgetBias, lstmKernel1, lstmBias1, data, c, h);
@@ -593,14 +315,6 @@ async function generateStep(loopId: number) {
   const delta = Math.max(
       0, currentPianoTimeSec - piano.now() - GENERATION_BUFFER_SECONDS);
   setTimeout(() => generateStep(loopId), delta * 1000);
-  if ((piano.now() - newMelTimeOut) > 30) {
-    SlonimskyIndex += 1;
-    updatePitchHistogram(SlonimskyHists[SlonimskyIndex]);
-    console.log(SlonimskyHists[SlonimskyIndex]);
-    console.log(newMelTimeOut);
-    newMelTimeOut = currentPianoTimeSec;
-    console.log(newMelTimeOut);
-  }
 }
 
 let midi;
@@ -753,6 +467,8 @@ function playOutput(index: number) {
 function resetRnnRepeatedly() {
   if (modelReady) {
     resetRnn();
+    SlonimskyIndex += 1 % SloTotal;
+    updatePitchHistogram(SlonimskyHists[SlonimskyIndex]);
   }
   setTimeout(resetRnnRepeatedly, RESET_RNN_FREQUENCY_MS);
 }
