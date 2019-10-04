@@ -481,25 +481,17 @@ let sketch = function (p: p5) {
   let height = p.windowHeight;
   p.setup = function () {
   p.createCanvas(width, height);
-} // eliminated createGraphic as it was slowing the animation down.
-  //Nice effect if the processor can handle it (or if it was coded better).
+  p.frameRate(30);
+  p.angleMode(p.DEGREES);
+  }
   p.draw = function () {
     p.fill(0, 12);
     p.rect(0, 0, width, height);
     p.noStroke();
-    if (newNote[0]) {
-      let GoldenNote: number = newNote[1] * Math.E;
-      p.fill(p.color(newNote[2] * 255, newNote[1] * 2, p.random(255)));
-      p.ellipse(p.random(width), p.random(height), GoldenNote, newNote[1]);
-      newNote[0] = false;
-    }
+    p.fill(p.color(newNote[2] * 255, newNote[1] * 2, p.random(255)));
+    p.rotate(p.random(0, 360));
+    p.ellipse(p.random(width), p.random(height), Math.floor(p.random(256, 8192) / newNote[1]), Math.floor(p.random(256, 8192) / newNote[1]));
   }
-  // p.mousePressed = function() {
-  //   let randomScale = Math.floor(Math.random() * SloHistsLength);
-  //   updatePitchHistogram(SlonimskyHists[randomScale]);
-  // }
-  //what about mapping the scales to the day, so that Slonimsky dreams through every day,
-  //with all the scales taking the length of 24 hours?
 }
 
 new p5(sketch)
