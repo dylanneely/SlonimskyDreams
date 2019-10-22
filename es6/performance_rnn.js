@@ -127,24 +127,18 @@ function resetRnn() {
     currentLoopId++;
     generateStep(currentLoopId);
 }
-const densityControl = document.getElementById('note-density');
-const densityDisplay = document.getElementById('note-density-display');
-const gainSliderElement = document.getElementById('gain');
-let globalGain = +gainSliderElement.value;
-const notes = ['c', 'cs', 'd', 'ds', 'e', 'f', 'fs', 'g', 'gs', 'a', 'as', 'b'];
-const pitchHistogramElements = notes.map(note => document.getElementById('pitch-' + note));
+const densityControl = 1.2;
+let globalGain = 25;
+const pitchHistogramElements = Slonimsky_1.SlonimskyHists[SlonimskyIndex];
 function updateConditioningParams() {
-    const pitchHistogram = pitchHistogramElements.map(e => {
-        return parseInt(e.value, 10) || 0;
-    });
+    const pitchHistogram = pitchHistogramElements;
     console.log('Scale ' + (SlonimskyIndex + 1) + ': ' + pitchHistogram);
     if (noteDensityEncoding != null) {
         noteDensityEncoding.dispose();
         noteDensityEncoding = null;
     }
-    const noteDensityIdx = parseInt(densityControl.value, 10) || 0;
+    const noteDensityIdx = densityControl;
     const noteDensity = DENSITY_BIN_RANGES[noteDensityIdx];
-    densityDisplay.innerHTML = noteDensity.toString();
     noteDensityEncoding =
         tf.oneHot(tf.tensor1d([noteDensityIdx + 1], 'int32'), DENSITY_BIN_RANGES.length + 1).as1D();
     if (pitchHistogramEncoding != null) {
@@ -161,15 +155,8 @@ function updateConditioningParams() {
     pitchHistogramEncoding = buffer.toTensor();
 }
 function updatePitchHistogram(newHist) {
-    let allZero = true;
     for (let i = 0; i < newHist.length; i++) {
-        allZero = allZero && newHist[i] === 0;
-    }
-    if (allZero) {
-        newHist = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    }
-    for (let i = 0; i < newHist.length; i++) {
-        pitchHistogramElements[i].value = newHist[i].toString();
+        pitchHistogramElements[i] = newHist[i];
     }
     updateConditioningParams();
 }
@@ -233,11 +220,9 @@ function generateStep(loopId) {
 let midi;
 let activeMidiOutputDevice = null;
 (() => __awaiter(this, void 0, void 0, function* () {
-    const midiOutDropdownContainer = document.getElementById('midi-out-container');
     try {
         const navigator = window.navigator;
         midi = yield navigator.requestMIDIAccess();
-        const midiOutDropdown = document.getElementById('midi-out');
         let outputDeviceCount = 0;
         const midiOutputDevices = [];
         midi.outputs.forEach((output) => {
@@ -248,21 +233,10 @@ let activeMidiOutputDevice = null;
           name:${output.name}
           version: ${output.version}`);
             midiOutputDevices.push(output);
-            const option = document.createElement('option');
-            option.innerText = output.name;
-            midiOutDropdown.appendChild(option);
             outputDeviceCount++;
         });
-        midiOutDropdown.addEventListener('change', () => {
-            activeMidiOutputDevice =
-                midiOutputDevices[midiOutDropdown.selectedIndex - 1];
-        });
-        if (outputDeviceCount === 0) {
-            midiOutDropdownContainer.innerText = MIDI_NO_OUTPUT_DEVICES_FOUND_MESSAGE;
-        }
     }
     catch (e) {
-        midiOutDropdownContainer.innerText = MIDI_NO_OUTPUT_DEVICES_FOUND_MESSAGE;
         midi = null;
     }
 }))();
@@ -312,9 +286,6 @@ function playOutput(index) {
                 currentPianoTimeSec += (index - offset + 1) / STEPS_PER_SECOND;
                 activeNotes.forEach((timeSec, noteNum) => {
                     if (currentPianoTimeSec - timeSec > MAX_NOTE_DURATION_SECONDS) {
-                        console.info(`Note ${noteNum} has been active for ${currentPianoTimeSec - timeSec}, ` +
-                            `seconds which is over ${MAX_NOTE_DURATION_SECONDS}, will ` +
-                            `release.`);
                         if (activeMidiOutputDevice != null) {
                             activeMidiOutputDevice.send([
                                 MIDI_EVENT_OFF, noteNum,
@@ -358,12 +329,20 @@ let sketch = function (p) {
         p.angleMode(p.DEGREES);
     };
     p.draw = function () {
-        p.fill(0, 12);
-        p.rect(0, 0, width, height);
-        p.noStroke();
-        p.fill(p.color(newNote[2] * 255, newNote[1] * 2, p.random(255)));
-        p.rotate(p.random(0, 360));
-        p.ellipse(p.random(width), p.random(height), Math.floor(p.random(256, 8192) / newNote[1]), Math.floor(p.random(256, 8192) / newNote[1]));
+        p.background(0, 12);
+        p.textAlign(p.RIGHT);
+        p.textSize(20);
+        p.text("\"If the demands and situations of the electronic age change the function and relevance of the composer to society, they will also change the categories of judgment by which we determine the matter of artistic responsibility. By far the most important electronic contribution of the arts is the creation of a new and paradoxical condition of privacy . . . Whatever else we would predict about the electronic age, all the symptoms suggest a return to some degree of mythic anonymity within the social-artistic structure.\" - Glenn Gould", (p.windowWidth * 0.5 - 10), 10, p.windowWidth * 0.5, 200);
+        p.textAlign(p.LEFT);
+        p.textSize(60);
+        p.text("Slonimsky Dreams", 10, 70);
+        let xoff = 0;
+        for (let x = 0; x < width; x++) {
+            xoff += 0.005;
+            let n = p.noise(xoff, SlonimskyIndex, p.millis() / 50000);
+            p.stroke(p.color(newNote[2] * 255, newNote[1] * 2, (255 - (newNote[1] * 2))));
+            p.line(x, height * n, x, height);
+        }
     };
 };
 new p5(sketch);
